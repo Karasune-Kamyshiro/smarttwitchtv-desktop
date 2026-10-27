@@ -7,15 +7,14 @@ Gaming Mode / Big Picture.
 
 ## Download
 
-Ready-made builds are on the **Releases** page (or, for the latest commit, under
-*Actions → Build → Artifacts*):
+Ready-made builds are on the **Releases** page: the **latest** release is rebuilt on every
+change and every Monday (with the newest upstream SmartTwitchTV web app).
 
 - **Flatpak** (recommended, best Steam integration):
   `flatpak install --user SmartTwitchTV.flatpak`
 - **AppImage**: `chmod +x SmartTwitchTV-x86_64.AppImage && ./SmartTwitchTV-x86_64.AppImage`
 
-CI rebuilds every Monday with the latest upstream SmartTwitchTV web app. Push a tag like
-`v0.1.1` to publish a release.
+Pushing a tag like `v0.1.1` additionally publishes a fixed, versioned release.
 
 ## Build it yourself
 
