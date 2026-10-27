@@ -5,7 +5,19 @@ client made for TVs — packaged as a Flatpak and meant to be driven by a **remo
 controller** (keyboard and mouse work too). It runs full screen and fits nicely into Steam's
 Gaming Mode / Big Picture.
 
-## Install
+## Download
+
+Ready-made builds are on the **Releases** page (or, for the latest commit, under
+*Actions → Build → Artifacts*):
+
+- **Flatpak** (recommended, best Steam integration):
+  `flatpak install --user SmartTwitchTV.flatpak`
+- **AppImage**: `chmod +x SmartTwitchTV-x86_64.AppImage && ./SmartTwitchTV-x86_64.AppImage`
+
+CI rebuilds every Monday with the latest upstream SmartTwitchTV web app. Push a tag like
+`v0.1.1` to publish a release.
+
+## Build it yourself
 
 You need `flatpak` (preinstalled on SteamOS, Fedora, Mint, …) and `git`. Then:
 
@@ -21,9 +33,11 @@ it from your app menu or with `flatpak run io.github.smarttwitchtv.Desktop`.
 **Another PC:** `./scripts/build-flatpak.sh --bundle` also writes `SmartTwitchTV.flatpak`;
 install it there with `flatpak install --user SmartTwitchTV.flatpak`.
 
+AppImage: `./scripts/build-appimage.sh` (needs node ≥ 18, npm, git, curl).
+
 ## Update
 
-Run `./scripts/build-flatpak.sh` again. Every build pulls the latest SmartTwitchTV web app
+Download the newest release, or run `./scripts/build-flatpak.sh` again. Every build pulls the latest SmartTwitchTV web app
 from upstream, so new features and fixes from the original project come along automatically.
 
 ## Controls

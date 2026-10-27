@@ -53,6 +53,8 @@ modules:
           - .flatpak-builder
           - build-dir
           - repo
+          - flatpak_app
+          - .github
       # the SmartTwitchTV web app (UI + logic), updated on every build
       - type: git
         url: https://github.com/fgl27/SmartTwitchTV.git

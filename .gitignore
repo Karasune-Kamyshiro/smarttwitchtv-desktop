@@ -7,3 +7,5 @@ dev-assets/
 build-dir/
 repo/
 SmartTwitchTV.flatpak
+flatpak_app/
+*.AppImage
