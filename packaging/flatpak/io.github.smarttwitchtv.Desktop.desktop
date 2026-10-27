@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Name=SmartTwitchTV
+GenericName=Twitch Client
+Comment=Watch Twitch with a remote or controller
+Exec=smarttwitchtv %U
+Icon=io.github.smarttwitchtv.Desktop
+Terminal=false
+Categories=AudioVideo;Video;Player;TV;
+Keywords=twitch;stream;live;tv;controller;
+StartupWMClass=SmartTwitchTV
+StartupNotify=true
+Actions=windowed;
+
+[Desktop Action windowed]
+Name=Start in a window
+Exec=smarttwitchtv --windowed

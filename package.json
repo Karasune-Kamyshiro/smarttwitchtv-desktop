@@ -1,0 +1,18 @@
+{
+  "name": "smarttwitchtv-desktop",
+  "version": "0.1.0",
+  "description": "Desktop (Linux) build of the SmartTwitchTV Twitch client, made for remotes and controllers",
+  "main": "src/main.js",
+  "scripts": {
+    "prepare-web": "node scripts/prepare-web.mjs",
+    "start": "npm run prepare-web && electron .",
+    "dev": "npm run prepare-web && electron . --windowed --devtools",
+    "postinstall": "node node_modules/electron/install.js"
+  },
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "electron": "45.0.0",
+    "hls.js": "1.7.3"
+  },
+  "productName": "SmartTwitchTV"
+}

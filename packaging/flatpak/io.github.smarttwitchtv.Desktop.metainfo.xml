@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.smarttwitchtv.Desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>SmartTwitchTV</name>
+  <summary>Watch Twitch with a remote or controller</summary>
+  <description>
+    <p>
+      A desktop build of SmartTwitchTV, the Twitch client made for TVs. It runs full screen and is
+      driven entirely by a remote, a game controller or the keyboard, which makes it a good fit for
+      living-room PCs, stream machines and Steam's Gaming Mode.
+    </p>
+    <ul>
+      <li>Live streams, VODs, clips, games and followed channels</li>
+      <li>Live chat, picture-in-picture and up to four streams at once</li>
+      <li>Previews while browsing, quality selection and low-latency playback</li>
+    </ul>
+    <p>
+      This is an unofficial, community-made app with no affiliation with Twitch. The interface comes
+      from the SmartTwitchTV project by Felipe de Leon (github.com/fgl27/SmartTwitchTV).
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.smarttwitchtv.Desktop.desktop</launchable>
+  <url type="homepage">https://github.com/fgl27/SmartTwitchTV</url>
+  <url type="bugtracker">https://github.com/fgl27/SmartTwitchTV/issues</url>
+  <developer id="io.github.smarttwitchtv">
+    <name>SmartTwitchTV contributors</name>
+  </developer>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+  </content_rating>
+  <supports>
+    <control>gamepad</control>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>tv-remote</control>
+  </supports>
+  <categories>
+    <category>AudioVideo</category>
+    <category>Video</category>
+  </categories>
+  <releases>
+    <release version="0.1.0" date="2026-10-26">
+      <description>
+        <p>First desktop build: full TV mode with hls.js playback, gamepad support and a refreshed look.</p>
+      </description>
+    </release>
+  </releases>
+</component>

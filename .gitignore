@@ -1,0 +1,9 @@
+node_modules/
+web/
+dist/
+upstream
+dev-assets/
+.flatpak-builder/
+build-dir/
+repo/
+SmartTwitchTV.flatpak

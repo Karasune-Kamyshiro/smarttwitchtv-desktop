@@ -1,0 +1,313 @@
+/*
+ * SmartTwitchTV Desktop theme.
+ * Part 1: desktop-only elements (players, spinners, toast).
+ * Part 2: a visual refresh layered over the upstream TV UI (everything under html.stv-desktop).
+ *         Pure CSS: no layout sizes are changed, so the app's own focus/scroll math stays intact.
+ */
+:root {
+    --stv-accent: #9147ff;
+    --stv-accent-soft: #a970ff;
+    --stv-accent-glow: rgba(145, 71, 255, 0.35);
+    --stv-bg: #0e0e10;
+    --stv-surface: #18181b;
+    --stv-surface-2: #1f1f23;
+    --stv-line: rgba(255, 255, 255, 0.08);
+    --stv-text: #efeff1;
+    --stv-muted: #adadb8;
+    --stv-radius: 1.3vh;
+}
+
+/* The video sits behind the (transparent) page, so the backdrop lives on <html>. */
+html.stv-desktop {
+    background:
+        radial-gradient(110% 80% at 0% 0%, rgba(145, 71, 255, 0.16) 0%, rgba(14, 14, 16, 0) 55%),
+        radial-gradient(90% 70% at 100% 100%, rgba(80, 40, 160, 0.12) 0%, rgba(14, 14, 16, 0) 60%),
+        var(--stv-bg);
+    background-attachment: fixed;
+}
+
+.stv-hidden {
+    display: none !important;
+}
+
+.stv-player {
+    position: fixed;
+    background: #000;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+}
+
+/* previews sit on top of a card: match its rounded corners */
+.stv-player.stv-preview {
+    border-radius: calc(var(--stv-radius) - 0.2vh);
+}
+
+.stv-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #000;
+}
+
+.stv-spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4.5vh;
+    height: 4.5vh;
+    margin: -2.25vh 0 0 -2.25vh;
+    border-radius: 50%;
+    border: 0.45vh solid rgba(255, 255, 255, 0.18);
+    border-top-color: var(--stv-accent);
+    animation: stv-spin 0.8s linear infinite;
+}
+
+.stv-loading {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483100;
+    pointer-events: none;
+}
+
+.stv-loading-bottom .stv-spinner {
+    top: auto;
+    bottom: 8vh;
+}
+
+@keyframes stv-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.stv-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 6vh;
+    z-index: 2147483200;
+    max-width: 60vw;
+    padding: 1.2vh 2.2vh;
+    border-radius: 1.2vh;
+    background: var(--stv-surface);
+    color: var(--stv-text);
+    font: 500 2vh/1.35 Roboto, 'Inter', sans-serif;
+    box-shadow: 0 1vh 3vh rgba(0, 0, 0, 0.45);
+    transform: translate(-50%, 2vh);
+    opacity: 0;
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    pointer-events: none;
+}
+
+.stv-toast-show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* ===================================================================== Part 2: UI refresh */
+
+/* ---- thumbnails / cards ---------------------------------------------------- */
+html.stv-desktop .stream_thumbnail_live,
+html.stv-desktop .stream_thumbnail_channel,
+html.stv-desktop .stream_thumbnail_channel_vod,
+html.stv-desktop .stream_thumbnail_game,
+html.stv-desktop .stream_thumbnail_game_feed,
+html.stv-desktop .stream_thumbnail_user,
+html.stv-desktop .stream_thumbnail_side,
+html.stv-desktop .stream_thumbnail_player_feed,
+html.stv-desktop .inner_banner_holder {
+    border-radius: var(--stv-radius);
+    transition:
+        transform 160ms cubic-bezier(0.2, 0, 0, 1),
+        box-shadow 160ms cubic-bezier(0.2, 0, 0, 1),
+        background-color 160ms ease,
+        border-color 160ms ease !important;
+}
+
+/* image area of every card type. Round the box and the image itself — no overflow clipping,
+   which would push the cards into their own compositor layers above the side menu. */
+html.stv-desktop [class*='stream_thumbnail_'][class$='_img'],
+html.stv-desktop [class*='stream_thumbnail_'][class*='_img '],
+html.stv-desktop img.stream_img,
+html.stv-desktop img.stream_img_channels,
+html.stv-desktop img.stream_img_side {
+    border-radius: calc(var(--stv-radius) - 0.2vh);
+}
+
+/* focus: purple ring + soft glow + small lift (overrides the app's color-style rule) */
+html.stv-desktop .stream_thumbnail_focused,
+html.stv-desktop .stream_thumbnail_focused_no_ani,
+html.stv-desktop .feed_thumbnail_focused,
+html.stv-desktop .feed_thumbnail_focused_no_ani {
+    background-color: rgba(145, 71, 255, 0.13) !important;
+    border-color: var(--stv-accent-soft) !important;
+    color: #fff !important;
+    box-shadow:
+        0 0 0 0.35vh var(--stv-accent-glow),
+        0 1.6vh 4vh rgba(0, 0, 0, 0.55);
+    transform: scale(1.025);
+    z-index: 3;
+}
+
+/* card text hierarchy: name & title stay bright, game / uptime / viewers go muted */
+html.stv-desktop .stream_info_live,
+html.stv-desktop .stream_info_channel,
+html.stv-desktop .stream_info_game {
+    color: var(--stv-muted);
+}
+html.stv-desktop .stream_thumbnail_focused .stream_info_live,
+html.stv-desktop .stream_thumbnail_focused_no_ani .stream_info_live {
+    color: #d6d6de;
+}
+html.stv-desktop .stream_info_live_name {
+    letter-spacing: 0.01em;
+}
+
+/* ---- side menu ------------------------------------------------------------- */
+/* The panel keeps upstream's opaque black: it blends with the screens behind it, and a
+   gradient/shadow on this will-change:transform layer renders see-through in Chromium. */
+html.stv-desktop .side_panel_new_icons,
+html.stv-desktop .side_panel_new_icons_text_holder,
+html.stv-desktop .side_panel_new_text_options {
+    border-image: none !important;
+    border-color: transparent !important;
+    border-radius: 1vh;
+    text-shadow: none !important;
+}
+/* collapsed icon column: marks the current screen */
+html.stv-desktop .side_panel_new_icons_start {
+    background: rgba(145, 71, 255, 0.4) !important;
+    border-image: none !important;
+    border-color: transparent !important;
+    border-radius: 1vh;
+}
+/* expanded menu: the focused row */
+html.stv-desktop .side_panel_new_icons_text,
+html.stv-desktop .side_panel_new_icons_text_botton {
+    background: linear-gradient(90deg, rgba(145, 71, 255, 0.5) 0%, rgba(145, 71, 255, 0.08) 100%) !important;
+    border-image: none !important;
+    border-color: transparent !important;
+    border-radius: 1vh;
+    box-shadow: inset 0.45vh 0 0 var(--stv-accent-soft);
+}
+
+/* player side panel / feed lists */
+html.stv-desktop .side_panel_div_focused,
+html.stv-desktop .side_panel_feed_img_focus,
+html.stv-desktop .feed_end_name_focus {
+    border-color: var(--stv-accent-soft) !important;
+    border-image: none !important;
+    border-radius: var(--stv-radius);
+    box-shadow: 0 0 0 0.3vh var(--stv-accent-glow);
+}
+
+/* screen switcher tabs (Games · Front Page · Live …) */
+html.stv-desktop .stream_switch_focused {
+    background: var(--stv-accent) !important;
+    border-color: transparent !important;
+    border-image: none !important;
+    border-radius: 0.8vh;
+    color: #fff !important;
+}
+
+/* ---- dialogs ----------------------------------------------------------------- */
+html.stv-desktop .dialog_exit,
+html.stv-desktop .dialog_period,
+html.stv-desktop .about_dialogs {
+    background: var(--stv-surface) !important;
+    border: 0.15vh solid var(--stv-line) !important;
+    border-image: none !important;
+    border-radius: 2vh;
+    box-shadow: 0 3vh 9vh rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+}
+html.stv-desktop .about_text_title {
+    color: #fff;
+}
+html.stv-desktop .about_text a {
+    color: var(--stv-accent-soft);
+}
+
+html.stv-desktop .button_dialog,
+html.stv-desktop .button_search {
+    border: 0 !important;
+    border-image: none !important;
+    border-radius: 1vh !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    text-shadow: none !important;
+    transition: background-color 140ms ease;
+}
+html.stv-desktop .button_dialog_focused,
+html.stv-desktop .button_search_focused,
+html.stv-desktop .button_chat_focused {
+    background-color: var(--stv-accent) !important;
+    border-image: none !important;
+    text-shadow: none !important;
+    color: #fff !important;
+}
+
+/* stream-ended / next-stream choices */
+html.stv-desktop .dialog_end_icons,
+html.stv-desktop .dialog_end_icons_start {
+    border-radius: 1.6vh;
+}
+html.stv-desktop .dialog_end_icons_focus,
+html.stv-desktop .dialog_end_icons_start {
+    background-color: rgba(145, 71, 255, 0.22) !important;
+    border-color: var(--stv-accent-soft) !important;
+    box-shadow: 0 0 0 0.3vh var(--stv-accent-glow);
+}
+
+/* ---- settings ---------------------------------------------------------------- */
+html.stv-desktop .settings_div_focus,
+html.stv-desktop .settings_value_focus {
+    background-color: rgba(145, 71, 255, 0.16) !important;
+    border-image: none !important;
+    border-color: transparent !important;
+    border-radius: 0.9vh;
+}
+html.stv-desktop .settings_div_focus {
+    box-shadow: inset 0.45vh 0 0 var(--stv-accent-soft);
+}
+html.stv-desktop .settings_summary {
+    color: var(--stv-muted);
+}
+
+/* ---- player ------------------------------------------------------------------ */
+/* bottom control icons share the progress bar's focus class */
+html.stv-desktop .controls_button,
+html.stv-desktop .pause_button,
+html.stv-desktop .next_button {
+    border-radius: 0.8vh;
+    transition:
+        background-color 120ms ease,
+        border-color 120ms ease;
+}
+html.stv-desktop .controls_button.progress_bar_div_focus,
+html.stv-desktop .pause_button.progress_bar_div_focus,
+html.stv-desktop .next_button.progress_bar_div_focus {
+    background-color: rgba(145, 71, 255, 0.55) !important;
+    border-color: var(--stv-accent-soft) !important;
+}
+html.stv-desktop .progress_bar_div.progress_bar_div_focus {
+    background-color: rgba(14, 14, 16, 0.6) !important;
+    border-color: var(--stv-accent-soft) !important;
+    border-radius: 1.2vh;
+}
+html.stv-desktop .progress_bar_holder_focus {
+    box-shadow: 0 0 0 0.3vh var(--stv-accent-soft) !important;
+}
+html.stv-desktop .chat_input_class_focus,
+html.stv-desktop .chat_emotes_focus {
+    border-color: var(--stv-accent-soft) !important;
+    border-radius: 0.8vh;
+}
+
+/* the mouse is optional: hide the pointer when it is not being used */
+html.stv-desktop.stv-no-pointer,
+html.stv-desktop.stv-no-pointer * {
+    cursor: none !important;
+}

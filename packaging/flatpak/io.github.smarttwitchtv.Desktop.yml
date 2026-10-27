@@ -1,0 +1,76 @@
+# Flatpak manifest for SmartTwitchTV Desktop.
+#
+# Self-contained: the host only needs flatpak + flatpak-builder. The build pulls the
+# upstream SmartTwitchTV web app (git), installs Electron/hls.js with npm inside the SDK
+# and assembles everything into /app. Easiest way: ./scripts/build-flatpak.sh
+#
+# Note: npm needs network access during the build (build-args below). That is fine for
+# local builds; a Flathub submission would vendor the npm sources instead.
+id: io.github.smarttwitchtv.Desktop
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.node20
+base: org.electronjs.Electron2.BaseApp
+base-version: '24.08'
+command: smarttwitchtv
+separate-locales: false
+
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  # GPU for video decoding + gamepads/remotes (evdev). --device=all also covers older Flatpak versions.
+  - --device=all
+  # keep the screen awake while a stream plays
+  - --talk-name=org.freedesktop.ScreenSaver
+  - --talk-name=org.freedesktop.PowerManagement.Inhibit
+
+modules:
+  - name: smarttwitchtv
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/node20/bin
+      build-args:
+        - --share=network
+      env:
+        npm_config_cache: /run/build/smarttwitchtv/.npm-cache
+        ELECTRON_CACHE: /run/build/smarttwitchtv/.electron-cache
+    sources:
+      # this project
+      - type: dir
+        path: ../..
+        skip:
+          - .git
+          - node_modules
+          - dist
+          - web
+          - upstream
+          - dev-assets
+          - .flatpak-builder
+          - build-dir
+          - repo
+      # the SmartTwitchTV web app (UI + logic), updated on every build
+      - type: git
+        url: https://github.com/fgl27/SmartTwitchTV.git
+        branch: master
+        dest: upstream
+    build-commands:
+      - npm ci --no-audit --no-fund
+      # Electron ≥ 40 has no postinstall hook: fetch the prebuilt binary explicitly
+      - node node_modules/electron/install.js
+      - node scripts/prepare-web.mjs upstream
+      - node scripts/assemble.mjs /app/smarttwitchtv
+      # zypak provides the Chromium sandbox inside Flatpak; the setuid helper is not used.
+      - rm -f /app/smarttwitchtv/chrome-sandbox
+      - install -Dm755 packaging/flatpak/smarttwitchtv.sh /app/bin/smarttwitchtv
+      - install -Dm644 packaging/flatpak/io.github.smarttwitchtv.Desktop.desktop /app/share/applications/io.github.smarttwitchtv.Desktop.desktop
+      - install -Dm644 packaging/flatpak/io.github.smarttwitchtv.Desktop.metainfo.xml /app/share/metainfo/io.github.smarttwitchtv.Desktop.metainfo.xml
+      - install -Dm644 build/icon.svg /app/share/icons/hicolor/scalable/apps/io.github.smarttwitchtv.Desktop.svg
+      - |
+        for s in 512 256 128 64; do
+          install -Dm644 build/icon-$s.png /app/share/icons/hicolor/${s}x${s}/apps/io.github.smarttwitchtv.Desktop.png
+        done
